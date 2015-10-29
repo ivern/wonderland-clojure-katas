@@ -3,7 +3,7 @@
 (defn- gen-row [n m]
   (-> (+ n m) (mod 26) (+ (int \a)) (char)))
 
-(defn- look-up [predicate [k m]]
+(defn- look-up [predicate k m]
   (let [col (map (comp char #(+ (int \a) (mod % 26))) (range))
         row (map (comp char #(+ (int \a) (quot % 26))) (range))
         enc (flatten (map #(map (partial gen-row %) (range 26)) (range 26)))
@@ -13,21 +13,19 @@
 
 (defn encode [keyword message]
   (let [key (flatten (repeat (seq keyword)))
-        zip (map vector key (seq message))
         f (fn [k m [row col enc]]
             (if (and (= k col) (= m row))
               enc
               nil))]
-    (apply str (map (partial look-up f) zip))))
+    (apply str (map #(look-up f %1 %2) key (seq message)))))
 
 (defn decode [keyword message]
   (let [key (flatten (repeat (seq keyword)))
-        zip (map vector key (seq message))
         f (fn [k m [row col enc]]
             (if (and (= k col) (= m enc))
               row
               nil))]
-    (apply str (map (partial look-up f) zip))))
+    (apply str (map #(look-up f %1 %2) key (seq message)))))
 
 (defn- grow [keyword n]
   (let [len (count keyword)]
@@ -40,9 +38,8 @@
       (recur (inc n)))))
 
 (defn decipher [cipher message]
-  (let [zip (map vector (seq cipher) (seq message))
-        f (fn [k m [row col enc]]
+  (let [f (fn [k m [row col enc]]
             (if (and (= k enc) (= m row))
               col
               nil))]
-    (shrink (apply str (map (partial look-up f) zip)))))
+    (shrink (apply str (map #(look-up f %1 %2) (seq cipher) (seq message))))))
