@@ -6,7 +6,7 @@
 (def end-state [#{} #{:boat} #{:fox :goose :corn :you}])
 
 (defn options [place]
-  (let [stuff (filter #(% #{:fox :goose :corn}) place)]
+  (let [stuff (filter #{:fox :goose :corn} place)]
     (cons #{:you} (map #(hash-set :you %) stuff))))
 
 (defn moves [state]
@@ -16,9 +16,9 @@
         outof set/difference]
     (cond
       (:you near) (map #(vector (outof near %) (into boat %) far) (options near))
-      (:you boat) (let [foo (map #(vector (into near %) (outof boat %) far) (options boat))
-                        bar (map #(vector near (outof boat %) (into far %)) (options boat))]
-                    (vec (into foo bar)))
+      (:you boat) (let [to-near (map #(vector (into near %) (outof boat %) far) (options boat))
+                        to-far (map #(vector near (outof boat %) (into far %)) (options boat))]
+                    (concat to-near to-far))
       (:you far) (map #(vector near (into boat %) (outof far %)) (options far)))))
 
 (defn valid? [state]
