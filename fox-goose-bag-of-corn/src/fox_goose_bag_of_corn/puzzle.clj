@@ -32,12 +32,11 @@
 (defn river-crossing-plan []
   (loop [fringe (cons start-pos PersistentQueue/EMPTY)
          seen (hash-set (first start-pos))]
-    (if-let [next-pos (first fringe)]
+    (when-let [next-pos (first fringe)]
       (let [next-state (first next-pos)]
         (if (= next-state end-state)
           (vec (reverse (map #(vec (map vec %)) next-pos)))
           (let [valid-moves (filter #(and (not (contains? seen %)) (valid? %))
                                     (moves next-state))]
             (recur (into (rest fringe) (map #(cons % next-pos) valid-moves))
-                   (into seen valid-moves)))))
-      [])))
+                   (into seen valid-moves))))))))
