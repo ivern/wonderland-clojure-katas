@@ -22,11 +22,12 @@
       (:you far) (map #(vector near (into boat %) (outof far %)) (options far)))))
 
 (defn valid? [state]
-  (and (< (count (nth state 1)) 4)
-       (not-any? #(and (or (and (:fox %) (:goose %))
-                           (and (:goose %) (:corn %)))
-                       (not (:you %)))
-                 state)))
+  (let [boat (nth state 1)]
+    (and (< (count boat) 4)
+         (not-any? #(and (or (and (:fox %) (:goose %))
+                             (and (:goose %) (:corn %)))
+                         (not (:you %)))
+                   state))))
 
 (defn river-crossing-plan []
   (loop [fringe (cons start-pos PersistentQueue/EMPTY)
