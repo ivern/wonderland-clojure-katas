@@ -10,9 +10,7 @@
     (cons #{:you} (map #(hash-set :you %) stuff))))
 
 (defn moves [state]
-  (let [near (nth state 0)
-        boat (nth state 1)
-        far (nth state 2)
+  (let [[near boat far] state
         outof set/difference]
     (cond
       (:you near) (map #(vector (outof near %) (into boat %) far) (options near))

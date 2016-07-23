@@ -7,16 +7,18 @@
 (defn index [pred coll]
   (first (keep-indexed #(when (pred %2) %1) coll)))
 
+(defn manhattan [r1 c1 r2 c2]
+  (let [abs (fn [n] (if (neg? n) (- n) n))]
+    (+ (abs (- r1 r2)) (abs (- c1 c2)))))
+
 (defn moves [maze]
-  (let [eq-s (fn [x] (= :S x))
-        abs (fn [n] (if (neg? n) (- n) n))
-        start-row (index #(some eq-s %) maze)
-        start-col (index eq-s (nth maze start-row))]
+  (let [start? (fn [x] (= :S x))
+        start-row (index #(some start? %) maze)
+        start-col (index start? (nth maze start-row))]
     (for [row (range (count maze))
           col (range (count (first maze)))
           :when (and (#{0 :E} (nth (nth maze row) col))
-                     (= 1 (+ (abs (- start-row row))
-                             (abs (- start-col col)))))
+                     (= 1 (manhattan start-row start-col row col)))
           :let [end? (= :E (nth (nth maze row) col))]]
       (vec (map-indexed #(cond-> %2
                           (= start-row %1) (assoc start-col :x)
